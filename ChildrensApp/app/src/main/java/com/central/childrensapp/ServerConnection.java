@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -21,13 +23,13 @@ public class ServerConnection {
     Context context;
 
     String[] ownedIDs;
-    String url = "";
+    String url = "http//localhost";
 
     String[] returnedIDs;
     String[] returnedTitle;
     String[] returnedMD5;
-    Drawable[] returnedIcon;
-    boolean[] returnedGood;
+    String[] returnedIcon;
+    String[] returnedGood;
 
     static InputStream inputStream = null;
 
@@ -41,11 +43,12 @@ public class ServerConnection {
         ownedIDs = Input;
     }
 
-    public void getCharArrayFromServer() {
+    public void getServerCharacters() {
 
         String result = "";
         DefaultHttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(url);
+        String httpDest = url + "/char_list.php";
+        HttpPost httppost = new HttpPost(httpDest);
 
         try {
             HttpResponse httpresponse = httpclient.execute(httppost);
@@ -83,15 +86,16 @@ public class ServerConnection {
             returnedIDs = new String[jArray.length()];
             returnedTitle = new String[jArray.length()];
             returnedMD5 = new String[jArray.length()];
-            returnedIcon = new Drawable[jArray.length()];
-            returnedGood = new boolean[jArray.length()];
+            returnedIcon = new String[jArray.length()];
+            returnedGood = new String[jArray.length()];
 
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject json_data = jArray.getJSONObject(i);
-                returnedIDs[i] = json_data.getString("id");
-                returnedTitle[i] = json_data.getString("title");
-                returnedMD5[i] = json_data.getString("md5");
-                returnedGood[i] = json_data.getBoolean("goodChar");
+                returnedIDs[i] = json_data.getString("char_id");
+                returnedTitle[i] = json_data.getString("char_title");
+                returnedMD5[i] = json_data.getString("char_md5");
+                returnedIcon[i] = json_data.getString("char_icon");
+                returnedGood[i] = json_data.getString("char_good");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -145,7 +149,7 @@ public class ServerConnection {
         }
     }
 
-    public void getServerCharacters(boolean RemoveOwned)
+/*    public void getServerCharacters(boolean RemoveOwned)
     {
         //PLACEHOLDER
         Drawable temp = context.getResources().getDrawable(R.drawable.empty_icon);
@@ -154,6 +158,7 @@ public class ServerConnection {
         returnedTitle = new String[]    {"Good FromServer", "Bad FromServer"};
         returnedGood = new boolean[]    {true,              false};
     }
+    */
 
     public String[] getIDs()
     {
@@ -172,11 +177,30 @@ public class ServerConnection {
 
     public Drawable[] getIcon()
     {
-        return returnedIcon;
+        Drawable[] returnedIconResult = new Drawable[returnedIcon.length];
+        for(int i = 0; i < returnedIcon.length; i++)
+        {
+            try
+            {
+                InputStream is = (InputStream) new URL(url).getContent();
+                returnedIconResult[i] = Drawable.createFromStream(is, "src");
+            } catch (Exception e) {
+                returnedIconResult[i] = null;
+            }
+        }
+        return returnedIconResult;
     }
 
     public boolean[] getGood()
     {
-        return returnedGood;
+        boolean[] returnedGoodResult = new boolean[returnedGood.length];
+        for(int i = 0; i < returnedGood.length; i++)
+        {
+            if(returnedGood[i].equals("t"))
+                returnedGoodResult[i] = true;
+            else if(returnedGood[i].equals("f"))
+                returnedGoodResult[i] = false;
+        }
+        return returnedGoodResult;
     }
 }

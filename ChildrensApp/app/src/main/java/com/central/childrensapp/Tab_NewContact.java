@@ -19,7 +19,7 @@ public class Tab_NewContact extends ListActivity {
         //Create a server connection and get list of characters
         ServerConnection connection= new ServerConnection(this);
         connection.setOwned(globalVar.getIdCharacters());
-        connection.getServerCharacters(true);
+        connection.getServerCharacters();
 
         // Binding resources Array to ListAdapter
         this.setListAdapter(new Adapter_ServerObject(connection.getIcon(), connection.getTitle(), connection.getGood(), connection.getIDs(), this.getApplicationContext()));
