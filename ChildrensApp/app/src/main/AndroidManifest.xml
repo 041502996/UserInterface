@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.central.childrensapp" >
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:name=".ApplicationVariables"
         android:allowBackup="true"
@@ -25,8 +28,6 @@
         <activity android:name=".Tab_PhoneGood"/>
         <activity android:name=".Tab_PhoneBad"/>
         <activity android:name=".Tab_NewContact"/>
-
-        <uses-permission android:name="android.permission.INTERNET"/>
     </application>
 
 </manifest>
