@@ -7,7 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import android.widget.VideoView;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 
 /*
 This Activity class is to be used as the video-player activity
@@ -19,12 +24,14 @@ public class DialActivity extends Activity {
     Button back;
     VideoView vid;
     String path;
-
+    InterstitialAd mInterstitialAd;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dial);
 
+        // Create the InterstitialAd and set the adUnitId.
+        mInterstitialAd = new InterstitialAd(this);
         //Get path from intent
         Intent fromIntent = getIntent();
         path = (String) fromIntent.getStringExtra("path");
@@ -51,9 +58,33 @@ public class DialActivity extends Activity {
         //When finished, close. Ad scripting goes here.
         vid.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                         public void onCompletion (MediaPlayer mp){
-                                            //Ad Code PlaceHolder
-                                            finish();
+         //Ad Code PlaceHolder
+         // Defined in res/values/strings.xml
+         mInterstitialAd.setAdUnitId(getString(R.string.ad_unit_id));
+         // Request for Ads & Add a test device to show Test Ads
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("CC5F2C72DF2B356BBF0DA198").build();
+
+         // Load ads into Interstitial Ads
+          mInterstitialAd.loadAd(adRequest);
+
+          // Prepare an Interstitial Ad Listener
+          mInterstitialAd.setAdListener(new AdListener() {
+          public void onAdLoaded() {
+          // Call displayInterstitial() function
+          showInterstitial();
+           }
+         });
+
                                         }
                                     } );
+    }
+    private void showInterstitial() {
+        // Show the ad if it's ready. Otherwise toast and restart the game.
+        if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
+
+        }
     }
 }
