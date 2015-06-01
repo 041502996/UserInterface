@@ -7,6 +7,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import java.util.concurrent.ExecutionException;
+
 /*
 Activity class to fill New Contact Phonebook
  */
@@ -27,17 +29,18 @@ public class Tab_NewContact extends ListActivity {
         if (networkInfo != null && networkInfo.isConnected()) {
             //Create a server connection and get list of characters
             connection.setOwned(globalVar.getIdCharacters());
-            connection.execute("/char_list.php");
+            try {
+                connection.execute("/char_list.php").get();
+                setListAdapter(new Adapter_ServerObject(connection.getIcon(), connection.getTitle(), connection.getGood(), connection.getIDs(), getApplicationContext()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
         else
         {
             Toast.makeText(this, "No Connection Available", Toast.LENGTH_LONG).show();
         }
-        // Binding resources Array to ListAdapter
-
-    }
-
-    public void createList(){
-        this.setListAdapter(new Adapter_ServerObject(connection.getIcon(), connection.getTitle(), connection.getGood(), connection.getIDs(), this.getApplicationContext()));
     }
 }
